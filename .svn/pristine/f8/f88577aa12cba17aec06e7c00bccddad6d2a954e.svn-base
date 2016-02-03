@@ -1,0 +1,117 @@
+import java.awt.Graphics;
+import java.util.Random;
+
+
+public class EnemyBoss extends Enemy{
+
+	private long timeSinceFire;
+	private final int FIRETIME = 150;
+	private int lastFire = 0;
+	
+	private static Sprite frame1 = SpriteStore.getInstance().getSprite("images/galaga_boss_large_sprite.png");
+	
+	private final long DURATION = 1500;
+	
+	private int hits;
+	private int lifePoints;
+	
+	Random random = new Random();
+	
+	public EnemyBoss (Game game, int x, int y){
+		
+		super(game, frame1, x,  y);
+		//this.setXSpeed(Game.ENEMY_SPEED_X);
+
+		timeSinceFire = System.currentTimeMillis();
+		
+		score = 200;
+		
+		hits = 0;
+		lifePoints = 100;
+		
+		
+	}
+	/**
+	 * move allows for the sprite to move back and fourth across the screen while not diving
+	 */
+	@Override
+	public void move(long delta)
+	{
+		/*
+		if(getX() >= Game.gameDimensions.width - 50 || getX() <= 50){
+			
+			this.setXSpeed(-this.getXSpeed());
+			this.setY(this.getY() + 10);
+		}
+		
+		if (this.getY() > 800) {
+			//TODO:get actor to reappear at the top of the screen
+		}
+		*/
+		super.move(delta);
+	}
+	@Override
+	public void doLogic() {
+		// TODO Auto-generated method stub
+		
+		
+	}
+
+	@Override
+	public void update() {
+		
+		
+	}
+	@Override
+	public void tryToFireFast(long fireTime ){
+		if (this != null){
+			getGame().addActor(new EnemyMissle(getGame(),getX()+getSprite().getWidth()/2-8,getY()+40));
+			getGame().addActor(new EnemyMissle(getGame(),getX()+getSprite().getWidth()/2,getY()+40));
+			
+			//timeSinceFire = FIRETIME;
+		}
+	}
+	@Override
+	public void tryToFireSlow(long fireTime ){
+		if (this != null){
+			getGame().addActor(new EnemySlowFire(getGame(),getX()+getSprite().getWidth()/2-4,getY()+40));
+			
+			//timeSinceFire = FIRETIME;
+		}
+	}
+	@Override
+	public void collidedWith(Actor other) {
+		// TODO Auto-generated method stub
+		
+		if(other instanceof Missle)
+		{
+			
+			hits++;
+			getGame().addActor(new Explosion(getGame(), other.getX(), other.getY()));
+			
+			if(hits == 50)
+			{
+				getGame().addActor(new Explosion(getGame(), getX(), getY()));
+				
+				getGame().removeActor(this);
+				isDead = true;
+				Game.enemyCount--;
+				getGame().addScore(score);
+
+			}
+		}
+		
+		if(other instanceof Player){
+			//getGame().removeActor(this);
+			//Game.enemyCount--;
+			//getGame().addScore(score);
+		}
+		
+	}
+	@Override
+	public void draw(Graphics g){
+		
+		super.draw(g);
+	}
+	
+}

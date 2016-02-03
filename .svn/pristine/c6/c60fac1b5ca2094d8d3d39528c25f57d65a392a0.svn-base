@@ -1,0 +1,56 @@
+/**
+ * 
+ */
+
+/**
+ * @author Zach Williamson
+ *
+ */
+public class Missle extends Actor
+{	 
+
+	public Missle(Game parentGame) {
+		super(parentGame, SpriteStore.getInstance().getSprite("images/galaga_missle_sprite.png"), 0, 0);
+		this.setYSpeed(-600);
+		getGame().SoundController.playFire();
+	}
+	
+	public Missle(Game parentGame, double x, double y, double xSpeed, double ySpeed)
+	{
+		this(parentGame);
+		this.setLocation(x, y);
+		this.setXSpeed(xSpeed);
+		this.setYSpeed(ySpeed);
+		getGame().SoundController.playFire();
+	}
+
+	
+	public Missle(Game parentGame, double x, double y)
+	{
+		this(parentGame);
+		this.setLocation(x, y);
+	}
+
+	@Override
+	public void doLogic() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void collidedWith(Actor other) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		if(getY() < 0)
+		{
+			getGame().removeActor(this);
+		}
+		
+	}
+
+}

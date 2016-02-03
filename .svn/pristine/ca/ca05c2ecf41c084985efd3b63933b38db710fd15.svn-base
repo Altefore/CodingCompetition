@@ -1,0 +1,82 @@
+import java.awt.Graphics;
+import java.util.ArrayList;
+
+/**
+ * 
+ */
+
+/**
+ * @author Zach
+ *
+ */
+public class StarField {
+	private Game game;
+	
+	private ArrayList<BigStar> bigStars;
+	private ArrayList<SmallStar> smallStars;
+	
+	private final int SMALLSTARDELAY = 400;
+	private final int BIGSTARDELAY = 300;
+	
+	private long timeOfLastSmallStar;
+	private long timeOfLastBigStar;
+	
+	public StarField(Game parentGame)
+	{
+		game = parentGame;
+		
+		bigStars = new ArrayList<BigStar>();
+		smallStars = new ArrayList<SmallStar>();
+		
+		timeOfLastSmallStar = 0;
+		timeOfLastBigStar = 0;
+	}
+	
+	public void update(long delta)
+	{
+		long currentTime = System.currentTimeMillis();
+		
+		for(SmallStar ss : smallStars)
+		{
+			ss.update();
+			ss.move(delta);
+		}
+		
+		for(BigStar bs : bigStars)
+		{
+			bs.update();
+			bs.move(delta);
+		}
+		
+		if(currentTime - timeOfLastSmallStar > SMALLSTARDELAY)
+		{
+			if (game.gameBeingPlayed)
+				smallStars.add(new SmallStar(game));
+			if (!game.gameBeingPlayed)
+				smallStars.add(new SmallStar(game,1));
+			timeOfLastSmallStar = currentTime;
+		}
+		
+		if(currentTime - timeOfLastBigStar > BIGSTARDELAY)
+		{
+			if (game.gameBeingPlayed)
+				bigStars.add(new BigStar(game));
+			if (!game.gameBeingPlayed)
+				bigStars.add(new BigStar(game,1));
+			timeOfLastBigStar = currentTime;
+		}
+	}
+	
+	public void draw(Graphics g)
+	{
+		for(SmallStar ss : smallStars)
+		{
+			ss.draw(g);
+		}
+		
+		for(BigStar bs : bigStars)
+		{
+			bs.draw(g);
+		}
+	}
+}

@@ -1,0 +1,40 @@
+import java.util.ArrayList;
+
+public abstract class FlightController {
+	ArrayList<Enemy> ships;
+	boolean isActive = false;
+	boolean isPaused = false;
+
+	public FlightController() {
+		ships = new ArrayList<Enemy>();
+	}
+	
+	public void addShips(ArrayList<Enemy> enemyShips)
+	{
+		System.out.println("add");
+		ships.clear();
+		ships = enemyShips;
+	}
+
+	public abstract void update();
+
+	public void go() {
+		isActive = true;
+	}
+	
+	public void pause()
+	{
+		isPaused = true;
+	}
+	
+	public void unPause()
+	{
+		isPaused = false;
+	}
+	
+	public ArrayList<Enemy> getShips()
+	{
+		System.out.println("get");
+		return ships;
+	}
+}

@@ -1,0 +1,31 @@
+/**
+ * 
+ * @author Jonathan Light
+ *
+ */
+public class SplashScreen extends Entity {
+
+	public SplashScreen ( Game game ){
+		
+		super(game, SpriteStore.getInstance().getSprite("images/galaga_logo_sprite.png"), 0, 0);
+		setX(game.getWidth()/2-getSprite().getWidth()/2);
+		setY(100);
+		getGame().SoundController.playIntro();
+		
+	}
+	
+	public SplashScreen ( Game game , boolean b){
+		
+		super(game, SpriteStore.getInstance().getSprite("images/galaga_gameover_sprite.png"), 0, 0);
+		setX(game.getWidth()/2-getSprite().getWidth()/2);
+		setY(100);
+		getGame().SoundController.playIntro();
+		
+	}	
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+}

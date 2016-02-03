@@ -1,0 +1,123 @@
+import java.awt.Graphics;
+import java.awt.Image;
+
+
+/**
+ * A Sprite that will be displayed on the screen.
+ * A Sprite may have multiple states that correspond to different display styles of the sprite.
+ * The state of a sprite will change based on the action being performed by the object a sprite represents.  
+ * 
+ * @author Zach Williamson
+ *
+ */
+public class Sprite {
+	/******************************************************
+	 * Member variables                                   *
+	 ******************************************************/
+	
+	/**
+	 * store all of the images available to this sprite
+	 */
+	private Image[] stateImages;
+	/**
+	 * the current state of the sprite
+	 */
+	private int state;
+	/**
+	 * the number of states that this sprite has
+	 */
+	private int numStates;
+	
+	/******************************************************
+	 * Constructors                                       *
+	 ******************************************************/
+	
+	/**
+	 * create a new sprite using a single image
+	 * @param image the image for the new sprite
+	 */
+	public Sprite(Image image)
+	{
+		stateImages = new Image[1];
+		stateImages[0] = image;
+		numStates = 1;
+		state = 0;
+	}
+	
+	/**
+	 * create a new sprite using a series of images 
+	 * @param images the images that will make up the new sprite
+	 */
+	public Sprite(Image[] images)
+	{
+		stateImages = images.clone();
+		numStates = stateImages.length;
+		state = 0;
+	}
+	
+	/******************************************************
+	 * Getters                                            *
+	 ******************************************************/
+	
+	/**
+	 * get the current width of the sprite
+	 * @return the current width of the sprite
+	 */
+	public int getWidth(){return stateImages[state].getWidth(null);}
+	
+	/**
+	 * get the current height of the sprite
+	 * @return the current height of the sprite
+	 */
+	public int getHeight(){return stateImages[state].getHeight(null);}
+	
+	/**
+	 * get the current state of the sprite
+	 * @return the current state of the sprite
+	 */
+	public int getState(){return state;}
+	
+	/**
+	 * get the number of states that this sprite has
+	 * @return the number of states that this sprite has
+	 */
+	public int getNumStates(){return numStates;}
+	
+	/******************************************************
+	 * Setters                                            *
+	 ******************************************************/
+	
+	/**
+	 * set the state of the sprite.  
+	 * This method will throw an IndexOutOfBoundsException if it tries to set the state higher than the number of available states
+	 * @param newState the new state to assign to the sprite
+	 * @throws IndexOutOfBoundsException
+	 */
+	public void setState(int newState) throws IndexOutOfBoundsException
+	{
+		if(newState >= numStates)
+		{
+			throw new IndexOutOfBoundsException();
+		}
+		else
+		{
+			state = newState;
+		}
+		
+	}
+	
+	/******************************************************
+	 * Mutators                                           *
+	 ******************************************************/
+	
+	/**
+	 * display the sprite at a certain location
+	 * @param g the graphics to use to display the sprite
+	 * @param x the x location to display the sprite 
+	 * @param y the y location to display the sprite
+	 */
+	public void draw(Graphics g, int x, int y)
+	{
+		g.drawImage(stateImages[state],x,y,null);
+	}
+}

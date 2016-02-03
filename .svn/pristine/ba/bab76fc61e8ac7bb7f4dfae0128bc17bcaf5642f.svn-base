@@ -1,0 +1,656 @@
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferStrategy;
+import java.util.ArrayList;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+
+// TODO keyboard handling
+// TODO mouse handling
+// TODO create GUI
+// TODO implement game loop
+
+/**
+ * @author Zach Williamson
+ *
+ */
+public class Game extends Canvas {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	long lastLoopTime = 0;
+	private ArrayList<Actor> actors = new ArrayList<Actor>();
+	private ArrayList<Actor> removeList = new ArrayList<Actor>();
+	private BufferStrategy strategy;	
+	private KeyInputHandler keyHandler = new KeyInputHandler();
+	public PlaySound SoundController;
+	
+	private Player player1;
+	private Player player2;
+	
+	
+	private boolean pause = false;
+	private boolean gameBeingPlayed = false;
+	
+	private long lastStarTime = 0;
+	private long lastSmallStarTime = 0;
+	
+	static int ENEMY_START_X = 400;
+	static int ENEMY_START_Y = 100;
+	static int ENEMY_SPEED_X= 70;
+
+	static int enemyCount = 0;
+	static int playerLives = 3;
+	
+	
+	private JFrame frame = new JFrame("Galaga Game");
+	static final Dimension frameDimensions = new Dimension (1050, 800);
+	static final Dimension gameDimensions = new Dimension(800, 800);
+	static final Dimension menuDimensions = new Dimension(250, 800);
+	
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		
+		Game game = new Game();
+		
+		game.showSplashScreen();
+		game.startGame();
+		
+	}
+	
+	/**
+	 * add an actor to the game
+	 * @param a the actor to add
+	 */
+	public void addActor(Actor a)
+	{
+		actors.add(a);
+	}
+	
+	/**
+	 * add to the list of actors to remove
+	 * @param a the actor to remove
+	 */
+	public void removeActor(Actor a)
+	{
+		removeList.add(a);
+	
+	}
+	
+	/**
+	 * This method is called to begin the game, it initializes all of the game parameters and starts the game loop
+	 */
+	public void startGame()
+	{
+		actors.clear();
+		initStars();
+		initPlayer1();
+		//initPlayer2();
+		initEnemy();
+		
+		setMenuPanel();
+		gameBeingPlayed = true;
+		
+		
+		gameLoop();
+	}
+	
+	/**
+	 * This is where the game is run, it contains all of the logic for
+	 * moving objects, user input, drawing, and game logic.
+	 */
+	public void gameLoop()
+	{
+		long lastLoopTime = System.currentTimeMillis()-20;
+		 
+		// TODO change 'true' to a variable that controls game state
+		while(true)
+		{
+			
+			
+			if (keyHandler.isPPressed()) {
+				pause();
+				keyHandler.setP(false);
+			}
+			// Get hold of a graphics context for the accelerated 
+
+			// surface and blank it out
+
+			while (!pause) {
+				long delta = System.currentTimeMillis() - lastLoopTime;
+				long starDelta = System.currentTimeMillis() - lastStarTime;
+				long smallStarDelta = System.currentTimeMillis()
+						- lastSmallStarTime;
+				System.out.println(1000 / delta);
+				lastLoopTime = System.currentTimeMillis();
+				Graphics2D g = (Graphics2D) getBufferStrategy()
+						.getDrawGraphics(); //TODO:figure out why g = null when run
+				g.setColor(Color.BLACK);
+				g.fillRect(0, 0, 800, 800);
+				for (Actor a : actors) {
+					a.update();
+				}
+				// Move all of the actors
+				for (Actor a : actors) {
+					a.move(delta);
+				}
+				//Draw all of the actors
+				for (Actor a : actors) {
+					a.draw(g);
+				}
+				if (starDelta > 600) {
+					initStars();
+					lastStarTime = System.currentTimeMillis();
+				}
+				if (smallStarDelta > 800) {
+					initSmallStars();
+					lastSmallStarTime = System.currentTimeMillis();
+				}
+				// Check for collisions between actors
+				// ToDo delete later
+				//Missle(Game parentGame, double x, double y, double xSpeed, double ySpeed)
+				//addActor(new Missle(this,getWidth()/2,getHeight()/2,0,300));
+				for (int first = 0; first < actors.size(); first++) {
+					Actor firstActor = actors.get(first);
+					for (int second = first + 1; second < actors.size(); second++) {
+						Actor secondActor = actors.get(second);
+						if (firstActor.collidesWith(secondActor)) {
+							firstActor.collidedWith(secondActor);
+							secondActor.collidedWith(firstActor);
+						}
+					}
+				}
+				if (isPlayer1Alive()) {
+					if (keyHandler.isRightPressed()
+							&& !keyHandler.isLeftPressed()) {
+						player1.setXSpeed(300);
+					}
+					if (keyHandler.isLeftPressed()
+							&& !keyHandler.isRightPressed()) {
+						player1.setXSpeed(-300);
+					}
+					if (keyHandler.isUpPressed() && !keyHandler.isDownPressed()) {
+						player1.setYSpeed(-300);
+					}
+					if (keyHandler.isDownPressed() && !keyHandler.isUpPressed()) {
+						player1.setYSpeed(300);
+					}
+					if (keyHandler.isSpacePressed()) {
+						player1.tryToFire(System.currentTimeMillis());
+					}
+				}
+				//initPlayer2
+				if (keyHandler.isZPressed()) {
+					System.out.println("Player 2 Start");
+					initPlayer2();
+					keyHandler.setZ(false);
+				}
+				if (isPlayer2Alive()) {
+					//movement for player 2
+					if (keyHandler.isDPressed() && !keyHandler.isAPressed()) {
+						player2.setXSpeed(300);
+					}
+					if (keyHandler.isAPressed() && !keyHandler.isDPressed()) {
+						player2.setXSpeed(-300);
+					}
+					if (keyHandler.isWPressed() && !keyHandler.isSPressed()) {
+						player2.setYSpeed(-300);
+					}
+					if (keyHandler.isSPressed() && !keyHandler.isWPressed()) {
+						player2.setYSpeed(300);
+					}
+					if (keyHandler.isOnePressed()) {
+						player2.tryToFire(System.currentTimeMillis());
+
+					}
+				}
+				if (keyHandler.isMPressed()) {
+					SoundController.mute();
+					keyHandler.setM(false);
+				}
+				if (keyHandler.isZeroPressed()) {
+					addActor(new EnemyMissle(this, player1.getX(),
+							player1.getY(), 0, 0));
+					keyHandler.setZero(false);
+				}
+				
+				if (keyHandler.isPPressed()) {
+					pause();
+					for (Actor a : actors) {
+						a.setXSpeed(0);
+					}
+					keyHandler.setP(false);
+				}
+				
+				for (Actor a : removeList) {
+					actors.remove(a);
+				}
+				removeList.clear();
+				if (isPlayer1Alive() == false) {
+					notifyDeath();
+					playerLives--;
+					long deathTime = System.currentTimeMillis();
+					initPlayer1();
+				}
+				if (enemyCount <= 0)
+					gameOver();
+				if (!gameBeingPlayed) {
+					gameOverScreen();
+				}
+				g.dispose();
+				strategy.show();
+				try {
+					Thread.sleep(10);
+				} catch (Exception e) {
+				}
+			}
+			
+			// TODO add keyboard and mouse handling
+		}
+	}
+	
+	/**
+	 * initalize all of the actors.  
+	 */
+	public void initPlayer1()
+	{
+		
+		
+		if (playerLives > 0){
+			player1 = new Player(this);
+			System.out.println("add ship");
+			actors.add( player1 );
+		}
+	
+	}
+	public void initPlayer2()
+	{
+		
+		if ( player2 == null ){
+			player2 = new Player(this);
+			System.out.println("add ship");
+			actors.add( player2 );
+		}
+	
+	}
+	public void initEnemy(){
+		
+		Enemy s0 = new SwoopingEnemy(this, ENEMY_START_X + 40, ENEMY_START_Y );
+		Enemy s1 = new SwoopingEnemy(this, ENEMY_START_X + 80, ENEMY_START_Y );
+		EnemyShipBasic e0 = new EnemyShipBasic(this, ENEMY_START_X, ENEMY_START_Y );
+		EnemyShipBasic e1 = new EnemyShipBasic(this, ENEMY_START_X-40, ENEMY_START_Y );
+		EnemyShipBasic e2 = new EnemyShipBasic(this, ENEMY_START_X-80, ENEMY_START_Y );
+		EnemyShipBasic e3 = new EnemyShipBasic(this, ENEMY_START_X-120, ENEMY_START_Y );
+		EnemyShipBasic e4 = new EnemyShipBasic(this, ENEMY_START_X, ENEMY_START_Y );
+		EnemyShipBasic e5 = new EnemyShipBasic(this, ENEMY_START_X+40, ENEMY_START_Y );
+		EnemyShipBasic e6 = new EnemyShipBasic(this, ENEMY_START_X+80, ENEMY_START_Y );
+		EnemyShipBasic e7 = new EnemyShipBasic(this, ENEMY_START_X+120, ENEMY_START_Y );
+		EnemyShipBasic e8 = new EnemyShipBasic(this, ENEMY_START_X, ENEMY_START_Y + 40);
+		EnemyShipBasic e9 = new EnemyShipBasic(this, ENEMY_START_X-40, ENEMY_START_Y + 40 );
+		EnemyShipBasic e10 = new EnemyShipBasic(this, ENEMY_START_X-80, ENEMY_START_Y + 40);
+		EnemyShipBasic e11 = new EnemyShipBasic(this, ENEMY_START_X-120, ENEMY_START_Y + 40);
+		EnemyShipBasic e12 = new EnemyShipBasic(this, ENEMY_START_X, ENEMY_START_Y + 40);
+		EnemyShipBasic e13 = new EnemyShipBasic(this, ENEMY_START_X+40, ENEMY_START_Y + 40 );
+		EnemyShipBasic e14 = new EnemyShipBasic(this, ENEMY_START_X+80, ENEMY_START_Y + 40);
+		EnemyShipBasic e15 = new EnemyShipBasic(this, ENEMY_START_X+120, ENEMY_START_Y + 40);
+
+		if ( player1 != null )
+			System.out.println("add Enemys");
+		actors.add( e0 );
+		actors.add( e1 );
+		actors.add( e2 );
+		actors.add( e3 );
+		actors.add( e4 );
+		actors.add( e5 );
+		actors.add( e6 );
+		actors.add( e7 );
+		actors.add( e8 );
+		actors.add( e9 );
+		actors.add( e10 );
+		actors.add( e11 );
+		actors.add( e12 );
+		actors.add( e13 );
+		actors.add( e14 );
+		actors.add( e15 );
+		enemyCount = 16;
+			//actors.add( s0 );
+			//actors.add( s1 );
+		
+	}
+	
+	public void initStars(){
+		
+		Star star = new Star(this);
+		actors.add(star);
+		
+	}
+	
+	public void initSmallStars(){
+		
+		SmallStar star = new SmallStar(this);
+		actors.add(star);
+		
+	}
+	
+	public Game(){
+		
+		
+		JPanel gamePanel = (JPanel) frame.getContentPane();
+
+		
+		gamePanel.setPreferredSize(frameDimensions);
+		gamePanel.setBackground(Color.BLACK);
+		
+		//panel.setLayout(null);
+		
+		gamePanel.setBounds(0, 0, gameDimensions.width, gameDimensions.height);
+		gamePanel.add ( this );
+		gamePanel.setVisible(true);
+		
+		/*
+		JPanel menuPanel = (JPanel) frame.getContentPane();
+		
+		menuPanel.setBackground(Color.WHITE);
+		menuPanel.setBounds(800,0,250,800);
+		menuPanel.add(this);
+		menuPanel.setVisible(true);
+		*/
+		setIgnoreRepaint(true);
+		
+		frame.pack();
+		frame.setResizable(false);
+		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		requestFocus();
+		createBufferStrategy(2);
+		
+		strategy = getBufferStrategy();
+		
+		addKeyListener(this.keyHandler);
+		SoundController = new PlaySound(true);
+		
+	}
+
+	private class KeyInputHandler extends KeyAdapter
+	{
+		//player 1 movement keys
+		private boolean leftPressed = false;
+		private boolean rightPressed = false;
+		private boolean upPressed = false;
+		private boolean downPressed = false;
+		private boolean spacePressed = false;
+		//player 2 movement keys
+		private boolean aPressed = false;
+		private boolean dPressed = false;
+		private boolean wPressed = false;
+		private boolean sPressed = false;
+		private boolean onePressed = false;
+		//user option keys
+		private boolean pPressed = false; // allows for pausing
+		private boolean zPressed = false; // allows for player 2
+		private boolean mPressed = false; // for muting sound
+		private boolean zeroPressed = false;
+		
+		public void keyTyped(KeyEvent e) {
+			if (e.getKeyChar() == 'p') {
+				pPressed = true;
+			}
+			if (e.getKeyChar() == 'z') {
+				zPressed = true;
+				//System.out.println("Z HAS BEEN PRESSED");
+			}
+			if (e.getKeyChar() == 'm') {
+				mPressed = true;
+			}
+			if (e.getKeyChar() == '0') {
+				
+				zeroPressed = true;
+			
+			}
+	    }
+		public void keyPressed(KeyEvent e)
+		{
+			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+				leftPressed = true;
+				//System.out.println("left");
+			}
+			if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+				rightPressed = true;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_UP) {
+				//System.out.println("UP HAS BEEN PRESSED");
+				upPressed = true;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+				downPressed = true;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+				spacePressed = true;
+			}
+			
+			if (e.getKeyCode() == KeyEvent.VK_A) {
+				aPressed = true;
+				System.out.println("a");
+			}
+			if (e.getKeyCode() == KeyEvent.VK_D) {
+				dPressed = true;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_W) {
+				wPressed = true;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_S) {
+				sPressed = true;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_1) {
+				onePressed = true;
+			}
+		}
+		
+		public void keyReleased(KeyEvent e)
+		{
+			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+				leftPressed = false;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+				rightPressed = false;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_UP) {
+				upPressed = false;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+				downPressed = false;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+				spacePressed = false;
+			}
+			
+			if (e.getKeyCode() == KeyEvent.VK_A) {
+				aPressed = false;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_D) {
+				dPressed = false;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_W) {
+				wPressed = false;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_S) {
+				sPressed = false;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_1) {
+				onePressed = false;
+			}
+		}
+		
+		public boolean isLeftPressed()
+		{
+			return leftPressed;
+		}
+		
+		public boolean isRightPressed()
+		{
+			return rightPressed;
+		}
+		
+		public boolean isUpPressed()
+		{
+			return upPressed;
+		}
+		
+		public boolean isDownPressed()
+		{
+			return downPressed;
+		}
+		public boolean isSpacePressed()
+		{
+			return spacePressed;
+		}
+		
+		public boolean isAPressed()
+		{
+			return aPressed;
+		}
+		
+		public boolean isDPressed()
+		{
+			return dPressed;
+		}
+		
+		public boolean isWPressed()
+		{
+			return wPressed;
+		}
+		
+		public boolean isSPressed()
+		{
+			return sPressed;
+		}
+		public boolean isOnePressed()
+		{
+			return onePressed;
+		}
+		public boolean isPPressed()
+		{
+			return pPressed;
+		}
+		public boolean isMPressed()
+		{
+			return mPressed;
+		}
+		public boolean isZPressed()
+		{
+			return zPressed;
+		}
+		public boolean isZeroPressed()
+		{
+			return zeroPressed;
+		}
+		public void setM(boolean b)
+		{
+			mPressed=b;
+		}
+		public void setZ(boolean b)
+		{
+			zPressed=b;
+		}
+		public void setZero(boolean b)
+		{
+			zeroPressed=b;
+		}
+		public void setP(boolean b)
+		{
+			pPressed=b;
+		}
+		
+	}
+	
+	public void showSplashScreen(){
+		Graphics2D g = (Graphics2D) getBufferStrategy().getDrawGraphics(); 
+		g.setColor(Color.BLACK);
+		g.fillRect(0,0,getWidth(),getHeight());
+		
+		SplashScreen galagaLogo = new SplashScreen(this);
+		galagaLogo.draw(g);
+		g.dispose();
+		BufferStrategy strategy = getBufferStrategy();
+		strategy.show();
+		
+		
+		try { Thread.sleep(2000); } catch (Exception e) {}
+		
+	}
+	
+	public void setMenuPanel(){
+		Graphics2D g = (Graphics2D) getBufferStrategy().getDrawGraphics();
+		g.setColor(Color.GRAY);
+		g.fillRect(800, 0, 250, 800);
+		
+		BufferStrategy strategy = getBufferStrategy();
+		strategy.show();
+		
+	}
+	
+	public void pause(){
+		pause = !pause;
+	}
+	
+	public boolean isPlayer1Alive(){
+		if (player1 != null) {
+			if (!player1.isPlayerAlive())
+				return false;
+			else
+				return true;
+		}
+		else
+			return false;
+	}
+	
+	public boolean isPlayer2Alive(){
+		if (player2 != null) {
+			if (!player2.isPlayerAlive())
+				return false;
+			else 
+				return true;
+		}
+		else
+			return false;
+	}
+	
+	public void gameOver(){
+		gameBeingPlayed = false;
+	}
+	
+	public void gameOverScreen(){
+		Graphics2D g = (Graphics2D) getBufferStrategy().getDrawGraphics(); 
+		g.setColor(Color.BLACK);
+		g.fillRect(0,0,getWidth(),getHeight());
+		
+		SplashScreen gameOver = new SplashScreen(this , true);
+		gameOver.draw(g);
+		g.dispose();
+		BufferStrategy strategy = getBufferStrategy();
+		strategy.show();
+		
+		
+		try { Thread.sleep(5000); } catch (Exception e) {}
+		gameBeingPlayed = true;
+		enemyCount++;
+		setMenuPanel();
+	}
+	
+	public void notifyDeath(){
+		System.out.println("You died");
+	}
+}

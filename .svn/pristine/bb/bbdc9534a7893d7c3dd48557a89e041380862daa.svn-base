@@ -1,0 +1,43 @@
+import java.util.Random;
+
+public class SmallStar extends Actor{
+	
+	Random random = new Random();
+	
+	public SmallStar(Game parentGame) {
+		super(parentGame, SpriteStore.getInstance().getSprite("images/galaga_small_star_sprite.png"), 0, 0);
+		this.setX(random.nextInt(Game.gameDimensions.width - 20));
+		this.setYSpeed(80+random.nextInt(225));
+		
+		
+	}
+	public SmallStar(Game parentGame, int i) {
+		super(parentGame, SpriteStore.getInstance().getSprite("images/galaga_small_star_sprite.png"), 0, 0);
+		this.setX(random.nextInt(Game.frameDimensions.width - 20));
+		this.setYSpeed(80+random.nextInt(225));
+		
+		
+	}
+
+	@Override
+	public void doLogic() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void collidedWith(Actor other) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void update() {
+		// TODO Auto-generated method stub
+		if(getY() > 800)
+		{
+			getGame().removeActor(this);
+		}
+		
+	}
+	
+}

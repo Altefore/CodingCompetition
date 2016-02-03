@@ -1,0 +1,36 @@
+
+public class EnemyMissle extends Actor{
+
+	public EnemyMissle(Game parentGame) {
+		super(parentGame, SpriteStore.getInstance().getSprite("images/galaga_missle_sprite.png"), 0, 0);
+		getGame().SoundController.playFire();
+	}
+	
+	public EnemyMissle(Game parentGame, double x, double y, double xSpeed, double ySpeed)
+	{
+		this(parentGame);
+		this.setLocation(x, y);
+		this.setXSpeed(xSpeed);
+		this.setYSpeed(ySpeed);
+		getGame().SoundController.playFire();
+	}
+
+	@Override
+	public void doLogic() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void collidedWith(Actor other) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+}

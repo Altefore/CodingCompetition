@@ -1,0 +1,80 @@
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+/**
+ * @author Zach Williamson
+ *
+ */
+public class Player extends Actor{
+	
+	private long timeSinceFire;
+	private final int FIRETIME = 250;
+	private boolean alive = false;
+	private long deathTimer = 2000;
+	private long invincibilityTimer = System.currentTimeMillis();
+	
+	public Player(Game game) {
+		super(game, SpriteStore.getInstance().getSprite("images/galaga_ship_sprite.png"), 400, 600);
+		this.setXSpeed(200);
+		timeSinceFire = System.currentTimeMillis();
+		alive = true;
+	}
+	
+	public void move(long delta)
+	{
+		if((getX() < 0 && getXSpeed() < 0)|| (getX() > Game.gameDimensions.width - getSprite().getWidth()-15 && getXSpeed() > 0))
+		{
+			setXSpeed(0);
+		}
+		if((getY() < getGame().getHeight() - 450 && getYSpeed() < 0) || (getY() > Game.gameDimensions.height -getSprite().getHeight() && getYSpeed() > 0))
+		{
+			setYSpeed(0);
+		}
+		
+		super.move(delta);
+		
+		setXSpeed(0);
+		setYSpeed(0);
+	}
+
+	@Override
+	public void doLogic() {
+		// TODO 
+		
+	}
+
+	@Override
+	public void collidedWith(Actor other) {
+		// TODO Auto-generated method stub
+		if (System.currentTimeMillis() - invincibilityTimer > 3000){
+			if(other instanceof EnemyMissle)
+			{
+				//getGame().SoundController.playDeath("Long");
+				getGame().removeActor(this);
+				alive = false;
+			}
+		}
+	}
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void tryToFire(long fireTime)
+	{
+		if(isPlayerAlive()){
+			if(fireTime - timeSinceFire > FIRETIME)
+			{
+				getGame().addActor(new Missle(getGame(),getX()+getSprite().getWidth()/2-4,getY()-20));
+				timeSinceFire = fireTime;
+			}
+		}
+	}
+	
+	public boolean isPlayerAlive(){
+		return alive;
+	}
+	
+}

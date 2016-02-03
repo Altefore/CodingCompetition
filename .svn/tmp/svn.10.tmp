@@ -1,0 +1,107 @@
+/**
+ * @author Zach Williamson
+ *
+ */
+public class Player extends Actor{
+	
+	private long timeSinceFire;
+	private final int FIRETIME = 250; // TODO: change back to 250
+	private boolean alive = false;
+	private long deathTimer = 2000;
+	private long invincibilityTimer;
+	private final int SPEED = 300;
+	
+	public Player(Game game) {
+		super(game, SpriteStore.getInstance().getSprite("images/galaga_ship_sprite.png"), 400, 600);
+		this.setXSpeed(200);
+		timeSinceFire = System.currentTimeMillis();
+		this.invincibilityTimer = System.currentTimeMillis();
+		alive = true;
+	}
+	public Player(Game game, int player) {
+		super(game, SpriteStore.getInstance().getSprite("images/galaga_ship2_sprite.png"), 400, 600);
+		this.setXSpeed(200);
+		timeSinceFire = System.currentTimeMillis();
+		this.invincibilityTimer = System.currentTimeMillis();
+		alive = true;
+	}
+	public void move(long delta)
+	{
+		if((getX() < 0 && getXSpeed() < 0)|| (getX() > Game.gameDimensions.width - getSprite().getWidth()-15 && getXSpeed() > 0))
+		{
+			setXSpeed(0);
+		}
+		if((getY() < getGame().getHeight() - 450 && getYSpeed() < 0) || (getY() > Game.gameDimensions.height -getSprite().getHeight() && getYSpeed() > 0))
+		{
+			setYSpeed(0);
+		}
+		
+		super.move(delta);
+		
+		setXSpeed(0);
+		setYSpeed(0);
+	}
+
+	@Override
+	public void doLogic() {
+		// TODO 
+		
+	}
+
+	@Override
+	public void collidedWith(Actor other) {
+		// TODO Auto-generated method stub
+		if (!Game.is1Invincible){
+			if(other instanceof EnemyMissle || other instanceof Enemy || other instanceof EnemySlowFire )
+			{
+				//getGame().SoundController.playDeath("Long");
+				getGame().removeActor(this);
+				alive = false;
+			}
+		}
+	}
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public boolean tryToFire(long fireTime)
+	{
+		if(isPlayerAlive()){
+			if(fireTime - timeSinceFire > FIRETIME)
+			{
+				getGame().addActor(new Missle(getGame(),getX()+getSprite().getWidth()/2-4,getY()-20));
+				timeSinceFire = fireTime;
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean isPlayerAlive(){
+		return alive;
+	}
+	
+	public void goLeft()
+	{
+		setXSpeed(-1*SPEED);
+	}
+	
+	public void goRight()
+	{
+		setXSpeed(SPEED);
+	}
+	
+	public void goUp()
+	{
+		setYSpeed(-1*SPEED);
+	}
+	
+	public void goDown()
+	{
+		setYSpeed(SPEED);
+	}
+	
+}

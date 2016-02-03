@@ -1,0 +1,141 @@
+import java.awt.Rectangle;
+
+// TODO add collision detection
+// TODO add display code (maybe, could go into Entity class)
+
+/**
+ * Represents entities that are capable of performing actions, such as moving and interacting with other entities
+ * 
+ * @author Zach Williamson, Erik Cole, Jonathan Light
+ *
+ */
+public abstract class Actor extends Entity{
+	/******************************************************
+	 * Member variables                                   *
+	 ******************************************************/
+	
+	/**
+	 * the horizontal speed of the actor
+	 */
+	private double xSpeed;
+	/**
+	 * the vertical speed of the actor
+	 */
+	private double ySpeed;
+	
+	/******************************************************
+	 * Constructors                                   *
+	 ******************************************************/
+	
+	/**
+	 * construct a new actor with a given name, location (0,0), and speed (0,0)
+	 * @param entityName the name to assign the new actor
+	 */
+	public Actor(Game parentGame) {
+		super(parentGame);
+		xSpeed = 0.0;
+		ySpeed = 0.0;
+	}
+	
+	/**
+	 * construct a new actor with a given name and location
+	 * @param entityName the name to assign the new actor
+	 * @param xPosition the x position to assign the new actor
+	 * @param yPosition the y position to assign the new actor
+	 */
+	public Actor(Game parentGame, Sprite entitySprite, double xPosition, double yPosition)
+	{
+		super(parentGame, entitySprite, xPosition, yPosition);
+		xSpeed = 0.0;
+		ySpeed = 0.0;
+	}
+	
+	/**
+	 * construct a new actor with a given name, location, and speed
+	 * @param entityName the name to assign the new actor
+	 * @param xPosition the x position to assign the new actor
+	 * @param yPosition the y position to assign the new actor
+	 * @param xSpeed the x speed to assign the new actor
+	 * @param ySpeed the y speed to assign the new actor
+	 */
+	public Actor(Game parentGame, Sprite entitySprite, double xPosition, double yPosition, double xSpeed, double ySpeed)
+	{
+		this(parentGame, entitySprite, xPosition, yPosition);
+		this.xSpeed = xSpeed;
+		this.ySpeed = ySpeed;
+	}
+	
+	/******************************************************
+	 * Getters                                            *
+	 ******************************************************/
+	
+	/**
+	 * get the x speed of the actor
+	 * @return the x speed of the actor
+	 */
+	public double getXSpeed(){return xSpeed;}
+	/**
+	 * get the y speed of the actor
+	 * @return the y speed of the actor
+	 */
+	public double getYSpeed(){return ySpeed;}
+	
+	/******************************************************
+	 * Setters                                            *
+	 ******************************************************/
+	
+	/**
+	 * set the x speed of the actor
+	 * @param xSpeed the x speed to assign to the actor
+	 */
+	public void setXSpeed(double xSpeed)
+	{
+		this.xSpeed = xSpeed;
+	}
+	
+	/**
+	 * set the y speed of the actor
+	 * @param ySpeed the y speed to assign to the actor
+	 */
+	public void setYSpeed(double ySpeed)
+	{
+		this.ySpeed = ySpeed;
+	}
+	
+	/******************************************************
+	 * Mutators                                           *
+	 ******************************************************/
+	
+	/**
+	 * move the set the location of the actor based off of the actors speed and the time since the actor was last moved
+	 * @param delta the time since the actor was last moved in milliseconds
+	 */
+	public void move(long delta)
+	{
+		setLocation(getX()+(getXSpeed()*delta)/1000.0,getY()+(getYSpeed()*delta)/1000.0);
+	}
+	
+	/**
+	 * check whether this actor is currently colliding with another actor
+	 * @param other the actor to check for a collision
+	 */
+	public boolean collidesWith(Actor other)
+	{
+		Rectangle meRect = new Rectangle((int)getX(),(int)getY(),getSprite().getWidth(),getSprite().getHeight());
+		Rectangle themRect = new Rectangle((int)other.getX(),(int)other.getY(),other.getSprite().getWidth(),other.getSprite().getHeight());
+		return meRect.intersects(themRect);
+	}
+	
+	/**
+	 * perform actions based on the current state of the object. This is where the actor should react to collisions and interact with other actors
+	 */
+	public abstract void doLogic();
+	
+	/**
+	 * implement logic for colliding with other objects
+	 * @param other
+	 */
+	public abstract void collidedWith(Actor other);
+	
+	
+}

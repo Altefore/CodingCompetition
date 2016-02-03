@@ -1,0 +1,120 @@
+import java.util.Random;
+
+/**
+ * 
+ */
+
+/**
+ * @author Zach Williamson, Erik Cole, Jonathan Light
+ *
+ */
+public class FastDivingFlightController extends FlightController {
+
+	public int diveIndex;
+	public long startTime;
+	public int diveTime;
+	public double returnHeight;
+	public double diveOffset;
+	public boolean diving;
+	
+	public Random rand;
+	
+	public void go()
+	{
+		for(Enemy e: ships)
+		{
+			e.setXSpeed(xSpeed);
+		}
+		
+		rand = new Random();
+		diveTime = rand.nextInt(1000) + 1000;
+		diveIndex = (ships.size()-1 == 0 ? 0 : rand.nextInt(ships.size()-1) ) ;
+		returnHeight = FlightController.mainY + yOffset;
+		diveOffset = 0;
+		startTime = System.currentTimeMillis();
+		diving = true;
+		
+		super.go();
+	}
+	
+	@Override
+	public void update(long delta) {
+		if(isPaused == false)
+		{
+			returnHeight = FlightController.mainY + yOffset;
+			for(Enemy e : ships)
+			{
+				e.setXSpeed(FlightController.xSpeed);
+				e.setY(FlightController.mainY + yOffset);
+			}
+			
+			boolean changeDirection = false;
+			for(Enemy e: ships)
+			{
+				if((e.getX() < 0 && e.getXSpeed() < 0)|| (e.getX() > Game.gameDimensions.getWidth()-e.getSprite().getWidth() && e.getXSpeed() > 0))
+				{
+					changeDirection = true;
+				}
+			}
+			if(changeDirection)
+			{
+				FlightController.xSpeed = -1*FlightController.xSpeed;
+				FlightController.mainY += FlightController.yIncrement;
+				for(Enemy e: ships)
+				{
+					e.setXSpeed(FlightController.xSpeed);
+					e.setY(FlightController.mainY + yOffset);
+				}
+			}
+			
+			if(diving){
+				double diveSpeed = (System.currentTimeMillis() - startTime < diveTime ? 250 : -200);
+				diveOffset += diveSpeed/50;
+				ships.get(diveIndex).setY(ships.get(diveIndex).getY() + diveOffset);
+				if(diveSpeed > 0)
+				{
+					if(rand.nextInt(100) < 4)
+					{
+						ships.get(diveIndex).tryToFireFast(System.currentTimeMillis());
+					}
+					else if(rand.nextInt(100) < 2)
+					{
+						ships.get(diveIndex).tryToFireSlow(System.currentTimeMillis());
+					}
+				}
+				if(diveSpeed < 0 && ships.get(diveIndex).getY() < returnHeight)
+				{
+					ships.get(diveIndex).setY(returnHeight);
+					ships.get(diveIndex).setYSpeed(0);
+					diving = false;
+				}
+				if(ships.get(diveIndex).isDead)
+				{
+					diving = false;
+				}
+			}
+			
+			if(diving == false)
+			{
+				rand = new Random();
+				
+				if(rand.nextInt(100) < 2 + (System.currentTimeMillis() - startTime)/5000)
+				{
+					diveTime = rand.nextInt(2000) + 1000;
+					diveIndex =  (ships.size()-1 == 0 ? 0 : rand.nextInt(ships.size()-1) ) ; 
+					returnHeight = FlightController.mainY + yOffset;
+					diveOffset = 0;
+					if(!ships.get(diveIndex).isDead)
+					{
+						startTime = System.currentTimeMillis();
+						diving = true;
+					}
+				}
+			}
+			
+		}
+		
+		super.update(delta);
+	}
+
+}

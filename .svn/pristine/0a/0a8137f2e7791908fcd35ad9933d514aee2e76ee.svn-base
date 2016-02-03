@@ -1,0 +1,76 @@
+/**
+ * 
+ */
+
+/**
+ * @author Zach
+ *
+ */
+public class Explosion extends Actor {
+
+	private long creationTime;
+	private final int DURATION = 300;
+	
+	private static Sprite frame1 = SpriteStore.getInstance().getSprite("images/galaga_explosion1_sprite.png");
+	private static Sprite frame2 = SpriteStore.getInstance().getSprite("images/galaga_explosion2_sprite.png");
+	private static Sprite frame3 = SpriteStore.getInstance().getSprite("images/galaga_explosion3_sprite.png");
+	private static Sprite frame4 = SpriteStore.getInstance().getSprite("images/galaga_explosion4_sprite.png");
+	private static Sprite frame5 = SpriteStore.getInstance().getSprite("images/galaga_explosion5_sprite.png");
+	private static Sprite frame6 = SpriteStore.getInstance().getSprite("images/galaga_explosion6_sprite.png");
+	private static Sprite frame7 = SpriteStore.getInstance().getSprite("images/galaga_explosion7_sprite.png");
+	
+	public Explosion(Game parentGame, double xPosition, double yPosition) {
+		super(parentGame, frame1, xPosition, yPosition);
+		creationTime = System.currentTimeMillis();
+	}
+
+	@Override
+	public void doLogic() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void collidedWith(Actor other) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void update() {
+		long currentTime = System.currentTimeMillis();
+		
+		if(currentTime - creationTime > DURATION)
+		{
+			getGame().removeActor(this);
+		}
+		else if(currentTime - creationTime > (DURATION*6)/7)
+		{
+			setSprite(frame7);
+		}
+		else if(currentTime - creationTime > (DURATION*5)/7)
+		{
+			setSprite(frame6);
+		}
+		else if(currentTime - creationTime > (DURATION*4)/7)
+		{
+			setSprite(frame5);
+		}
+		else if(currentTime - creationTime > (DURATION*3)/7)
+		{
+			setSprite(frame4);
+		}
+		else if(currentTime - creationTime > (DURATION*2)/7)
+		{
+			setSprite(frame3);
+		}
+		else if(currentTime - creationTime > DURATION/7)
+		{
+			setSprite(frame2);
+		}
+		
+	}
+	
+	
+
+}

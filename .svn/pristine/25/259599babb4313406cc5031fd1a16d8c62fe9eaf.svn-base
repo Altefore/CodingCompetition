@@ -1,0 +1,79 @@
+
+public class SwoopingEnemy extends Enemy{
+
+	private long timeSinceFire;
+	private final int FIRETIME = 150;
+	private boolean isSwooping;
+	private long swoopTick;
+	
+	public SwoopingEnemy (Game game, int x, int y){
+		
+		super(game, SpriteStore.getInstance().getSprite("images/galaga_enemy1_sprite.png"), x, y);
+		this.setXSpeed(Game.ENEMY_SPEED_X);
+		timeSinceFire = System.currentTimeMillis();
+		
+		isSwooping = false;
+		swoopTick = 0;
+		
+	}
+	
+	@Override
+	public void move(long delta)
+	{
+		if((getX() < 0 && getXSpeed() < 0)|| (getX() > getGame().getWidth()-getSprite().getWidth() && getXSpeed() > 0))
+		{
+			setXSpeed(-1*getXSpeed());
+			setY(getY() + 10);
+		}
+		
+		if(isSwooping)
+		{
+			if(getXSpeed() > 0)
+			{
+				setXSpeed(100);
+			}
+			else
+			{
+				setXSpeed(-100);
+			}
+			if( swoopTick > 3000)
+			{
+				setYSpeed(300- swoopTick/5);
+				swoopTick+= delta;
+			}	
+			else
+			{
+				if(getXSpeed() > 0)
+				{
+					setXSpeed(50);
+				}
+				else
+				{
+					setXSpeed(-50);
+				}
+				isSwooping = false;
+				swoopTick = 0;
+				setYSpeed(0);
+			}
+		}
+		
+		super.move(delta);
+	}
+	
+	public void swoop()
+	{
+		isSwooping = true;
+	}
+
+	@Override
+	public void doLogic() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+}

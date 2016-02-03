@@ -1,0 +1,59 @@
+import java.awt.Color;
+import java.awt.Graphics;
+import java.util.Random;
+/**
+ * 
+ * @author Zach Williamson, Erik Cole, Jonathan Light
+ *
+ */
+public class BigStar extends Actor{
+	
+	Random random = new Random();
+	
+	Color color;
+	
+	public BigStar(Game parentGame) {
+		super(parentGame, SpriteStore.getInstance().getSprite("images/galaga_star_sprite.png"), 0, 0);
+		this.setX(random.nextInt(Game.gameDimensions.width - 20));
+		this.setYSpeed(250+random.nextInt(250));
+		color = Color.WHITE;//Color.getHSBColor(random.nextFloat(), .8f, 1.0f);
+	}
+	public BigStar(Game parentGame, int i) {
+		super(parentGame, SpriteStore.getInstance().getSprite("images/galaga_star_sprite.png"), 0, 0);
+		this.setX(random.nextInt(Game.frameDimensions.width - 20));
+		this.setYSpeed(250+random.nextInt(250));
+		color = Color.WHITE;//Color.getHSBColor(random.nextFloat(), .8f, 1.0f);
+	}
+
+	@Override
+	public void doLogic() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void collidedWith(Actor other) {
+		if(other instanceof Actor)
+		{
+			//TODO:add logic for passing behind sprite
+		
+		}
+	}
+
+	public void update() {
+		// TODO Auto-generated method stub
+		if(getY() > 800)
+		{
+			getGame().removeActor(this);
+		}
+		
+	}
+	
+	@Override
+	public void draw(Graphics g)
+	{
+		g.setColor(color);
+		g.fillRect((int)getX(), (int)getY(), 3, 3);
+	}
+	
+}

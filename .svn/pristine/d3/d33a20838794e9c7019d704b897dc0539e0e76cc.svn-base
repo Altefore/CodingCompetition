@@ -1,0 +1,137 @@
+import java.awt.BorderLayout;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+/**
+ * this class contains the code to create a server that may be queried for files
+ * 
+ * @author Zach Williamson, Erik Cole, Jonathan Light
+ *
+ */
+public class HighScoreServer{
+	/**
+	 * this object contains the object stream for sending data to the client
+	 */
+	private ObjectOutputStream output;
+	/**
+	 * this object contains the object stream for receiving data from the client
+	 */
+	private ObjectInputStream input;
+	/**
+	 * this object contains the server socket that will be used for communicating with the client
+	 */
+	private ServerSocket server;
+	/**
+	 * this object contains the socket where communications with the client will take place
+	 */
+	private Socket connection;
+	
+	public static void main(String[] args)
+	{
+		HighScoreServer hsServ;
+		try {
+			hsServ = new HighScoreServer();
+			while(true){
+				System.out.println("Server Read: " + hsServ.read());
+				File file = new File("scores.txt");
+				BufferedReader fileReader = new BufferedReader(new FileReader(file));
+				
+				hsServ.sendData(fileReader.readLine());
+				
+				fileReader.close();
+			}
+			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			//hsServ.closeConnection();
+		}
+		
+	}
+	
+	public HighScoreServer() throws IOException
+	{
+		server = new ServerSocket(10004,0);
+		
+		System.out.println("Waiting for connection...");
+		connection = server.accept();
+		
+		output = new ObjectOutputStream(connection.getOutputStream());
+		output.flush();
+		
+		input = new ObjectInputStream(connection.getInputStream());
+		
+		System.out.println("Got connections");
+		
+		File file = new File("scores.txt");
+		BufferedReader fileReader = new BufferedReader(new FileReader(file));
+		
+		sendData(fileReader.readLine());
+		
+		fileReader.close();
+		
+		//sendData("Server recognition");
+	}
+	
+	private String read()
+	{
+		try {
+			String message = (String)input.readObject();
+			
+			BufferedWriter writer = new BufferedWriter(new FileWriter("scores.txt"));
+			
+		    writer.write(message);
+		    writer.close();
+			
+			return message;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private void sendData(String message)
+	{
+		try
+		{
+			output.writeObject(message);
+			output.flush();
+		}
+		catch(IOException ioExcpetion)
+		{
+			ioExcpetion.printStackTrace();
+		}
+	}
+	
+	private void closeConnection()
+	{	
+		try
+		{
+			output.close();
+			input.close();
+			connection.close();
+		}
+		catch(IOException ioException)
+		{
+			ioException.printStackTrace();
+		}
+	}
+	
+	
+}

@@ -1,0 +1,45 @@
+/**
+ * 
+ */
+
+/**
+ * @author Zach
+ *
+ */
+public class DefaultFlightController extends FlightController {
+	int xSpeed = 75;
+	
+	public void go()
+	{
+		for(Enemy e: ships)
+		{
+			e.setXSpeed(xSpeed);
+		}
+		
+		super.go();
+	}
+	
+	@Override
+	public void update() {
+		if(this.isPaused == false)
+		{
+			boolean changeDirection = false;
+			for(Enemy e: ships)
+			{
+				if((e.getX() < 0 && e.getXSpeed() < 0)|| (e.getX() > e.getGame().getWidth()-e.getSprite().getWidth() && e.getXSpeed() > 0))
+				{
+					changeDirection = true;
+				}
+			}
+			if(changeDirection)
+			{
+				xSpeed = -1*xSpeed;
+				for(Enemy e: ships)
+				{
+					e.setXSpeed(xSpeed);
+				}
+			}
+		}
+	}
+
+}

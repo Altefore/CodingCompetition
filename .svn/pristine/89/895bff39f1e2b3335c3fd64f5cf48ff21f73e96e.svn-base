@@ -1,0 +1,52 @@
+import java.util.Random;
+/**
+ * 
+ * @author Jonathan Light
+ *
+ */
+public class EnemyShipBasic extends Enemy{
+
+	private long timeSinceFire;
+	private final int FIRETIME = 150;
+	Random random = new Random();
+	
+	public EnemyShipBasic (Game game, int x, int y){
+		
+		super(game, SpriteStore.getInstance().getSprite("images/galaga_enemy1_sprite.png"), x,  y);
+		this.setXSpeed(Game.ENEMY_SPEED_X);
+
+		timeSinceFire = System.currentTimeMillis();
+		
+	}
+	/**
+	 * move allows for the sprite to move back and fourth across the screen while not diving
+	 */
+	@Override
+	public void move(long delta)
+	{
+		if(getX() >= 750 || getX() <= 50){
+			
+			this.setXSpeed(-this.getXSpeed());
+			this.setY(this.getY() + 10);
+		}
+		
+		if (this.getY() > 800) {
+			//TODO:get actor to reappear at the top of the screen
+		}
+		super.move(delta);
+	}
+	@Override
+	public void doLogic() {
+		// TODO Auto-generated method stub
+		
+		
+	}
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
+}

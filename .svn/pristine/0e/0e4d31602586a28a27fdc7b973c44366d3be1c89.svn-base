@@ -1,0 +1,41 @@
+import java.util.Random;
+ /**
+  * 
+  * @author Jonathan Light
+  *
+  */
+public abstract class Enemy extends Actor{
+
+	Random random = new Random();
+	
+	public Enemy (Game game, Sprite sprite , int x, int y){
+		
+		super (game, sprite, x, y);
+		
+	}
+	
+	
+	@Override
+	public void collidedWith(Actor other) {
+		// TODO Auto-generated method stub
+		
+		if(other instanceof Missle)
+		{
+			//getGame().SoundController.playExplosion();
+			getGame().SoundController.playDeath("Short");
+			
+			getGame().removeActor(this);
+			getGame().removeActor(other);
+			Game.enemyCount--;
+		}
+		
+	}
+	
+	public void tryToFire(long fireTime ){
+		if (this != null){
+			getGame().addActor(new Missle(getGame(),getX()+getSprite().getWidth()/2-4,getY()+40, (double)(30-random.nextInt(60)), (double)(280-random.nextInt(60))));
+			
+			//timeSinceFire = FIRETIME;
+		}
+	}
+}

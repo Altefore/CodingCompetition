@@ -1,0 +1,65 @@
+import java.lang.String;
+/**
+ * @author Zach Williamson, Erik Cole, Jonathan Light
+ *
+ */
+public class CheatCode {
+
+	private String code;
+
+	private Game game;
+	
+	public CheatCode(Game g,String s)
+	{
+	game=g;
+	code=s;
+    
+    
+	checkCode();	
+	}
+	private void checkCode()
+	{
+		
+				
+					
+					//System.out.print(code);
+					if(0==code.compareTo("klife"))
+					{
+						game.playerLives = 3;
+						System.out.print("addlife");
+					    
+					}
+					else if(0==code.compareTo("kscoe"))
+					{
+						game.addScore(250);
+						game.setCode("");
+						System.out.print("addScore");
+					    
+					}
+					else if (0==code.compareTo("k777"))
+					{
+						game.addScore(50);
+						
+					}
+					else if (0==code.compareTo("kfast"))
+					{
+					Player.setFireTime(50);
+					
+					game.setCode("");
+					}
+					else if(0==code.compareTo("kslow"))
+					{
+					Player.setFireTime(250);
+					game.setCode("");
+					}
+					else if(code.length()>=5)
+					{
+						game.setCode("");
+						System.out.print("code Cleared");
+					}
+						
+				
+				
+	}
+	
+}

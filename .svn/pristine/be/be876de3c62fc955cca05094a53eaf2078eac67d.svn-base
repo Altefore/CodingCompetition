@@ -1,0 +1,77 @@
+import java.util.Random;
+/**
+ * 
+ * @author Zach Williamson, Erik Cole, Jonathan Light
+ *
+ */
+public class EnemyShipBasic extends Enemy{
+
+	private long timeSinceFire;
+	private final int FIRETIME = 150;
+	private int lastFire = 0;
+	
+	private static Sprite frame1 = SpriteStore.getInstance().getSprite("images/galaga_enemy1_sprite.png");
+	private static Sprite frame2 = SpriteStore.getInstance().getSprite("images/galaga_enemy2_sprite.png");
+	private static Sprite frame3 = SpriteStore.getInstance().getSprite("images/galaga_enemy3_sprite.png");
+	private final long DURATION = 1500;
+	
+	Random random = new Random();
+	
+	public EnemyShipBasic (Game game, int x, int y){
+		
+		super(game, SpriteStore.getInstance().getSprite("images/galaga_enemy1_sprite.png"), x,  y);
+		//this.setXSpeed(Game.ENEMY_SPEED_X);
+
+		timeSinceFire = System.currentTimeMillis();
+		
+		score = 10;
+		
+	}
+	/**
+	 * move allows for the sprite to move back and fourth across the screen while not diving
+	 */
+	@Override
+	public void move(long delta)
+	{
+		/*
+		if(getX() >= Game.gameDimensions.width - 50 || getX() <= 50){
+			
+			this.setXSpeed(-this.getXSpeed());
+			this.setY(this.getY() + 10);
+		}
+		
+		if (this.getY() > 800) {
+			//TODO:get actor to reappear at the top of the screen
+		}
+		*/
+		super.move(delta);
+	}
+	@Override
+	public void doLogic() {
+		// TODO Auto-generated method stub
+		
+		
+	}
+
+	@Override
+	public void update() {
+		if(System.currentTimeMillis() % DURATION < DURATION/4)
+		{
+			setSprite(frame1);
+		}
+		else if(System.currentTimeMillis() % DURATION < DURATION/2)
+		{
+			setSprite(frame2);
+		}
+		else if(System.currentTimeMillis() % DURATION < DURATION*3/4)
+		{
+			setSprite(frame1);
+		}
+		else
+		{
+			setSprite(frame3);
+		}
+	}
+	
+	
+}

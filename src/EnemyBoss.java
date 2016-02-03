@@ -1,0 +1,115 @@
+import java.awt.Color;
+import java.awt.Graphics;
+import java.util.Random;
+
+/**
+ * 
+ * @author Zach Williamson, Erik Cole, Jonathan Light
+ *
+ */
+public class EnemyBoss extends Enemy{
+
+	//private long timeSinceFire;
+	//private final int FIRETIME = 150;
+	//private int lastFire = 0;
+	
+	private static Sprite frame1 = SpriteStore.getInstance().getSprite("images/galaga_boss_large_sprite.png");
+	
+	//private final long DURATION = 1500;
+	
+	private int hits;
+	private double hitPoints = 0;
+	private double currentHealth = 0;
+	Random random = new Random();
+	
+	public EnemyBoss (Game game, int x, int y, int hP){
+		
+		super(game, frame1, x,  y);
+
+		//timeSinceFire = System.currentTimeMillis();
+		
+		score = 200;
+		
+		hits = 0;
+		hitPoints = hP;
+		currentHealth = hP;
+		
+		
+	}
+	/**
+	 * move allows for the sprite to move back and fourth across the screen while not diving
+	 */
+	@Override
+	public void move(long delta)
+	{
+		
+		super.move(delta);
+	}
+	@Override
+	public void doLogic() {
+		// TODO Auto-generated method stub
+		
+		
+	}
+
+	@Override
+	public void update() {
+		
+		
+	}
+	@Override
+	public void tryToFireFast(long fireTime ){
+		if (this != null){
+			getGame().addActor(new EnemyMissle(getGame(),getX()+getSprite().getWidth()/2-8,getY()+40));
+			getGame().addActor(new EnemyMissle(getGame(),getX()+getSprite().getWidth()/2,getY()+40));
+			
+		}
+	}
+	@Override
+	public void tryToFireSlow(long fireTime ){
+		if (this != null){
+			getGame().addActor(new EnemySlowFire(getGame(),getX()+getSprite().getWidth()/2-4,getY()+40));
+
+		}
+	}
+	@Override
+	public void collidedWith(Actor other) {
+		// TODO Auto-generated method stub
+		
+		if(other instanceof Missle)
+		{
+			
+			hits++;
+			currentHealth--;
+			getGame().addActor(new Explosion(getGame(), other.getX(), other.getY()));
+			
+			if(currentHealth <= 0)
+			{
+				getGame().addActor(new Explosion(getGame(), getX(), getY()));
+				
+				getGame().removeActor(this);
+				isDead = true;
+				Game.enemyCount--;
+				getGame().addScore(score);
+
+			}
+		}
+		
+		if(other instanceof Player){
+			//getGame().removeActor(this);
+			//Game.enemyCount--;
+			//getGame().addScore(score);
+		}
+		
+	}
+	@Override
+	public void draw(Graphics g){
+		
+		g.setColor(currentHealth/hitPoints >= .5 ? Color.GREEN : Color.RED);
+		g.fillRect( (int)(this.getX() + (getSprite().getWidth()*hits/hitPoints/2)) , 
+				(int) this.getY() - 20, (int)((getSprite().getWidth())*currentHealth/hitPoints), 4);
+		super.draw(g);
+		
+	}
+	
+}

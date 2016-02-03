@@ -1,0 +1,66 @@
+import java.util.ArrayList;
+/**
+ * 
+ * @author Zach Williamson, Erik Cole, Jonathan Light
+ *
+ */
+public abstract class FlightController {
+	public ArrayList<Enemy> ships;
+	protected static int xSpeed = 100;
+	protected static double mainY = 0;
+	protected static double yIncrement = 0;
+	protected double yOffset;
+	public boolean isActive = false;
+	public boolean isPaused = false;
+
+	public FlightController() {
+		ships = new ArrayList<Enemy>();
+		yOffset = 0.0;
+		isActive = false;
+		isPaused = false;
+	}
+	
+	
+	
+	public void addShips(ArrayList<Enemy> enemyShips)
+	{
+		System.out.println("add");
+		ships.clear();
+		ships = (ArrayList<Enemy>) enemyShips.clone();
+	}
+	
+	public void setYOffset(double offset)
+	{
+		this.yOffset = offset;
+	}
+
+	public void update(long delta)
+	{
+		/*
+		for(Enemy e : ships)
+		{
+			e.move(delta);
+		}
+		*/
+	}
+
+	public void go() {
+		isActive = true;
+	}
+	
+	public void pause()
+	{
+		isPaused = true;
+	}
+	
+	public void unPause()
+	{
+		isPaused = false;
+	}
+	
+	public ArrayList<Enemy> getShips()
+	{
+		System.out.println("get");
+		return (ArrayList<Enemy>) ships.clone();
+	}
+}

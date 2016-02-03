@@ -1,0 +1,51 @@
+/**
+ * 
+ */
+
+/**
+ * @author Zach Williamson, Erik Cole, Jonathan Light
+ *
+ */
+public class Missle extends Artillary
+{	 
+	private final double MISSLESPEED = -600;
+
+	public Missle(Game parentGame) {
+		super(parentGame, SpriteStore.getInstance().getSprite("images/galaga_missle_sprite.png"), 0, 0, 0, -600);
+
+	}
+	
+	public Missle(Game parentGame, double x, double y)
+	{
+		this(parentGame);
+		this.setLocation(x, y);
+		getGame().SoundController.playFire();
+	}
+
+	@Override
+	public void doLogic() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void collidedWith(Actor other) {
+		if(other instanceof Enemy)
+		{
+			getGame().removeActor(this);
+		}
+		
+	}
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		if(getY() < 0 || getY() > Game.gameDimensions.getHeight())
+		{
+			getGame().removeActor(this);
+			getGame().addMiss();
+		}
+		
+	}
+
+}
